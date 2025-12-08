@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Libro.0 – Stanza dell'annotazione</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="themes.css" />
+  <script src="themes.js" defer></script>
+  <script src="script-common.js" defer></script>
+</head>
+<body data-page="annota">
+  <!-- NAVBAR LIBRO.0 -->
+  <nav class="navbar-libro0">
+    <div class="nav-logo">
+      <a href="index.html">📘 Libro.0</a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="lettura.html">Lettura</a></li>
+      <li><a href="annota.html">Annota</a></li>
+      <li><a href="mappe.html">Mappe</a></li>
+      <li><a href="lavagna.html">Lavagna</a></li>
+      <li><a href="timeline.html">Timeline</a></li>
+      <li><a href="archivio.html">Archivio</a></li>
+      <li><a href="crea.html">Crea</a></li>
+      <li><a href="ricerca.html">Ricerca</a></li>
+    </ul>
+  </nav>
+
+
+  <header class="top-bar">
+    <div class="logo-area">
+      <span class="logo-main">Libro.0</span>
+      <span class="logo-sub">Stanza dell'annotazione</span>
+    </div>
+    <div class="theme-switcher" aria-label="Selettore tema">
+      <button data-theme="A">A</button>
+      <button data-theme="B">B</button>
+      <button data-theme="C">C</button>
+      <button data-theme="D">D</button>
+      <button data-theme="E">E</button>
+    </div>
+
+  </header>
+
+  <main class="room-main">
+    <section class="room-intro">
+      <h1>Quaderno personale</h1>
+      <p>
+        Questa stanza replica il gesto del quaderno: appunti, evidenziatore, schemi rapidi.
+        Nel prototipo trovi uno spazio di testo libero che puoi usare come taccuino digitale.
+      </p>
+    </section>
+
+    <section class="room-grid">
+      <div class="room-card">
+        <h2>Pagina a righe</h2>
+        <p>Scrivi i tuoi appunti liberi. Rimangono nel browser finché non svuoti la memoria.</p>
+        <textarea id="annota-notes" class="notebook-area" rows="12" placeholder="Inizia a scrivere qui…"></textarea>
+        <button id="annota-save" class="primary-btn">💾 Salva appunti</button>
+        <button id="annota-clear" class="secondary-btn">🗑️ Svuota</button>
+      </div>
+
+      <div class="room-card">
+        <h2>Post-it digitali (idea)</h2>
+        <p>
+          In una versione successiva qui potranno comparire post-it colorati,
+          disegnati con la penna o creati dalla lettura.
+        </p>
+        <ul>
+          <li>Idea 1: parole chiave della lezione.</li>
+          <li>Idea 2: domande aperte da inviare alla classe.</li>
+          <li>Idea 3: collegamenti personali (film, canzoni, ricordi).</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function() {
+      const KEY = "libro0-annota-notes";
+      const area = document.getElementById("annota-notes");
+      const btnSave = document.getElementById("annota-save");
+      const btnClear = document.getElementById("annota-clear");
+      if (!area) return;
+      area.value = localStorage.getItem(KEY) || "";
+      btnSave.addEventListener("click", () => {
+        localStorage.setItem(KEY, area.value);
+        alert("Appunti salvati nella memoria locale del browser.");
+      });
+      btnClear.addEventListener("click", () => {
+        if (confirm("Svuotare tutti gli appunti di questa stanza?")) {
+          area.value = "";
+          localStorage.removeItem(KEY);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

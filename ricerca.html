@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Libro.0 – Stanza della ricerca</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="themes.css" />
+  <script src="themes.js" defer></script>
+  <script src="script-common.js" defer></script>
+</head>
+<body data-page="ricerca">
+  <!-- NAVBAR LIBRO.0 -->
+  <nav class="navbar-libro0">
+    <div class="nav-logo">
+      <a href="index.html">📘 Libro.0</a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="lettura.html">Lettura</a></li>
+      <li><a href="annota.html">Annota</a></li>
+      <li><a href="mappe.html">Mappe</a></li>
+      <li><a href="lavagna.html">Lavagna</a></li>
+      <li><a href="timeline.html">Timeline</a></li>
+      <li><a href="archivio.html">Archivio</a></li>
+      <li><a href="crea.html">Crea</a></li>
+      <li><a href="ricerca.html">Ricerca</a></li>
+    </ul>
+  </nav>
+
+
+  <header class="top-bar">
+    <div class="logo-area">
+      <span class="logo-main">Libro.0</span>
+      <span class="logo-sub">Stanza della ricerca</span>
+    </div>
+    <div class="theme-switcher" aria-label="Selettore tema">
+      <button data-theme="A">A</button>
+      <button data-theme="B">B</button>
+      <button data-theme="C">C</button>
+      <button data-theme="D">D</button>
+      <button data-theme="E">E</button>
+    </div>
+
+  </header>
+
+  <main class="search-layout">
+    <section class="search-left">
+      <h1>Ricerca integrata</h1>
+      <p>
+        Questa pagina unisce ricerca interna e navigazione esterna, senza uscire dal Libro.0.
+        Nel prototipo, i risultati sono esempi statici e il browser integrato carica l'URL
+        che inserisci nella barra.
+      </p>
+
+      <form id="url-form" class="url-form">
+        <label for="url-input">Apri un indirizzo web</label>
+        <div class="url-row">
+          <input id="url-input" type="text" placeholder="https://…" />
+          <button type="submit" class="primary-btn">Apri</button>
+        </div>
+      </form>
+
+      <section class="search-results">
+        <h2>Risultati interni (esempio)</h2>
+        <ul>
+          <li><button class="link-like" data-url="stupore.html">Lo stupore in <em>X agosto</em></button></li>
+          <li><button class="link-like" data-url="digitale-purpurea.html">Simbolismo in <em>Digitale purpurea</em></button></li>
+          <li><button class="link-like" data-url="gelsomino/index.html">Simboli del <em>Gelsomino notturno</em></button></li>
+        </ul>
+
+        <h2>Risultati online (esempio)</h2>
+        <p class="small">
+          In una versione con motore di ricerca reale, qui comparirebbero link cliccabili
+          che si aprono nel browser interno sulla destra.
+        </p>
+        <ul>
+          <li><button class="link-like" data-url="https://it.wikipedia.org/wiki/Giovanni_Pascoli">Voce Wikipedia su Pascoli</button></li>
+          <li><button class="link-like" data-url="https://www.treccani.it/enciclopedia/giovanni-pascoli">Scheda Treccani</button></li>
+        </ul>
+      </section>
+    </section>
+
+    <section class="search-right">
+      <h2>Browser interno</h2>
+      <p class="small">
+        Alcuni siti potrebbero non permettere l'apertura in questa cornice: in quel caso
+        puoi sempre aprirli in una nuova scheda del browser.
+      </p>
+      <div class="browser-frame">
+        <iframe id="browser-frame" title="Browser interno Libro.0" src="about:blank"></iframe>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function() {
+      const form = document.getElementById("url-form");
+      const input = document.getElementById("url-input");
+      const frame = document.getElementById("browser-frame");
+      const links = document.querySelectorAll(".link-like");
+
+      function normalizeUrl(value) {
+        if (!value) return "";
+        if (value.startsWith("http://") || value.startsWith("https://")) return value;
+        if (value.startsWith("./") || value.startsWith("../") || value.endsWith(".html")) return value;
+        return "https://" + value;
+      }
+
+      form.addEventListener("submit", e => {
+        e.preventDefault();
+        const url = normalizeUrl(input.value.trim());
+        if (url) frame.src = url;
+      });
+
+      links.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const url = btn.getAttribute("data-url");
+          const normalized = normalizeUrl(url);
+          if (normalized) frame.src = normalized;
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

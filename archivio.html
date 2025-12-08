@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Libro.0 – Stanza dell'archivio</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="themes.css" />
+  <script src="themes.js" defer></script>
+  <script src="script-common.js" defer></script>
+</head>
+<body data-page="archivio">
+  <!-- NAVBAR LIBRO.0 -->
+  <nav class="navbar-libro0">
+    <div class="nav-logo">
+      <a href="index.html">📘 Libro.0</a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="lettura.html">Lettura</a></li>
+      <li><a href="annota.html">Annota</a></li>
+      <li><a href="mappe.html">Mappe</a></li>
+      <li><a href="lavagna.html">Lavagna</a></li>
+      <li><a href="timeline.html">Timeline</a></li>
+      <li><a href="archivio.html">Archivio</a></li>
+      <li><a href="crea.html">Crea</a></li>
+      <li><a href="ricerca.html">Ricerca</a></li>
+    </ul>
+  </nav>
+
+
+  <header class="top-bar">
+    <div class="logo-area">
+      <span class="logo-main">Libro.0</span>
+      <span class="logo-sub">Stanza dell'archivio</span>
+    </div>
+    <div class="theme-switcher" aria-label="Selettore tema">
+      <button data-theme="A">A</button>
+      <button data-theme="B">B</button>
+      <button data-theme="C">C</button>
+      <button data-theme="D">D</button>
+      <button data-theme="E">E</button>
+    </div>
+
+  </header>
+
+  <main class="room-main">
+    <section class="room-intro">
+      <h1>Archivio personale</h1>
+      <p>
+        Qui confluisce tutto: note, evidenziazioni, mappe, lavagne, timeline, elaborati.
+        Nel prototipo l'archivio è una bacheca concettuale, pronta a essere collegata
+        a un vero database in fasi successive.
+      </p>
+    </section>
+
+    <section class="room-grid">
+      <div class="room-card">
+        <h2>Cosa arriverà qui</h2>
+        <ul>
+          <li>Appunti dalla stanza Lettura.</li>
+          <li>Estratti dalla stanza Annotazione.</li>
+          <li>Screenshot o versioni delle lavagne.</li>
+          <li>Mappe concettuali salvate.</li>
+          <li>Versioni degli elaborati creativi.</li>
+        </ul>
+      </div>
+      <div class="room-card">
+        <h2>Archivio "manuale" (per ora)</h2>
+        <p>
+          Usa questo spazio per elencare cosa vuoi tenere a mente del tuo percorso su Pascoli.
+        </p>
+        <textarea id="archivio-notes" class="notebook-area" rows="10" placeholder="Scrivi qui ciò che vuoi archiviare…"></textarea>
+        <button id="archivio-save" class="primary-btn">💾 Segna in archivio</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function() {
+      const KEY = "libro0-archivio-notes";
+      const area = document.getElementById("archivio-notes");
+      const btn = document.getElementById("archivio-save");
+      if (!area || !btn) return;
+      area.value = localStorage.getItem(KEY) || "";
+      btn.addEventListener("click", () => {
+        localStorage.setItem(KEY, area.value);
+        alert("Annotazione archiviata nella memoria locale.");
+      });
+    })();
+  </script>
+</body>
+</html>

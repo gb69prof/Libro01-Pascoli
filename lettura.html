@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Libro.0 – Stanza della lettura</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="themes.css" />
+  <script src="themes.js" defer></script>
+  <script src="script-common.js" defer></script>
+</head>
+<body data-page="lettura">
+  <!-- NAVBAR LIBRO.0 -->
+  <nav class="navbar-libro0">
+    <div class="nav-logo">
+      <a href="index.html">📘 Libro.0</a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="lettura.html">Lettura</a></li>
+      <li><a href="annota.html">Annota</a></li>
+      <li><a href="mappe.html">Mappe</a></li>
+      <li><a href="lavagna.html">Lavagna</a></li>
+      <li><a href="timeline.html">Timeline</a></li>
+      <li><a href="archivio.html">Archivio</a></li>
+      <li><a href="crea.html">Crea</a></li>
+      <li><a href="ricerca.html">Ricerca</a></li>
+    </ul>
+  </nav>
+
+
+  <header class="top-bar">
+    <div class="logo-area">
+      <span class="logo-main">Libro.0</span>
+      <span class="logo-sub">Stanza della lettura</span>
+    </div>
+    <div class="theme-switcher" aria-label="Selettore tema">
+      <button data-theme="A">A</button>
+      <button data-theme="B">B</button>
+      <button data-theme="C">C</button>
+      <button data-theme="D">D</button>
+      <button data-theme="E">E</button>
+    </div>
+
+  </header>
+
+  <main class="reading-layout">
+    <aside class="sidebar">
+      <h2>Come funziona questa stanza</h2>
+      <p>
+        Qui il testo si legge come su una pagina di libro, ma ogni gesto viene salvato:
+        sottolineature, note sul margine, invii a mappe, timeline, archivio.
+      </p>
+      <ul class="chapter-list">
+        <li><a href="stupore.html" class="chapter-link" data-chapter="stupore">Lo stupore</a></li>
+        <li><a href="visione.html" class="chapter-link" data-chapter="visione">Visione del mondo</a></li>
+        <li><a href="fanciullino.html" class="chapter-link" data-chapter="fanciullino">Poetica del fanciullino</a></li>
+        <li><a href="forma.html" class="chapter-link" data-chapter="forma">La forma</a></li>
+        <li><a href="simbolismo.html" class="chapter-link" data-chapter="simbolismo">Il simbolismo</a></li>
+        <li><a href="digitale-purpurea.html" class="chapter-link" data-chapter="digitale-purpurea">Digitale purpurea</a></li>
+        <li><a href="x-agosto.html" class="chapter-link" data-chapter="xagosto">X agosto</a></li>
+      </ul>
+    </aside>
+
+    <section class="reading-page">
+      <article class="lesson-text">
+        <h1>Stanza della lettura</h1>
+        <p>
+          La stanza della lettura è il cuore del Libro.0: qui lo studente incontra i testi,
+          li attraversa lentamente, li annota e li invia alle altre stanze cognitive.
+        </p>
+        <p>
+          Puoi usare i pulsanti di evidenziazione presenti nelle pagine di Pascoli per
+          creare sottolineature e note che rimangono disponibili nel tuo browser.
+        </p>
+        <p>
+          Ogni capitolo di esempio (stupore, visione del mondo, fanciullino, forma,
+          simbolismo, Digitale purpurea, X agosto) è già impaginato secondo questo modello:
+          testo principale a sinistra, margine attivo a destra.
+        </p>
+        <p>
+          Questa pagina non ospita un singolo testo, ma spiega la logica di lettura del
+          Libro.0 e offre un accesso rapido alle lezioni di Pascoli.
+        </p>
+      </article>
+      <aside class="margin-notes">
+        <h2>Spazio mentale</h2>
+        <p>
+          Qui, nelle altre pagine, compariranno le tue note veloci e i collegamenti verso
+          mappe, timeline, lavagna e archivio. In questo prototipo le note sono locali
+          al tuo dispositivo (localStorage).
+        </p>
+      </aside>
+    </section>
+  </main>
+
+  <!-- Modale per zoom immagini e strumenti condivisi -->
+  <div id="modal-overlay" class="modal-overlay" hidden>
+    <div class="modal">
+      <button class="modal-close" id="modal-close">✕</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+</body>
+</html>

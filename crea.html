@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Libro.0 – Stanza della creazione</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="themes.css" />
+  <script src="themes.js" defer></script>
+  <script src="script-common.js" defer></script>
+</head>
+<body data-page="crea">
+  <!-- NAVBAR LIBRO.0 -->
+  <nav class="navbar-libro0">
+    <div class="nav-logo">
+      <a href="index.html">📘 Libro.0</a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="lettura.html">Lettura</a></li>
+      <li><a href="annota.html">Annota</a></li>
+      <li><a href="mappe.html">Mappe</a></li>
+      <li><a href="lavagna.html">Lavagna</a></li>
+      <li><a href="timeline.html">Timeline</a></li>
+      <li><a href="archivio.html">Archivio</a></li>
+      <li><a href="crea.html">Crea</a></li>
+      <li><a href="ricerca.html">Ricerca</a></li>
+    </ul>
+  </nav>
+
+
+  <header class="top-bar">
+    <div class="logo-area">
+      <span class="logo-main">Libro.0</span>
+      <span class="logo-sub">Stanza della creazione</span>
+    </div>
+    <div class="theme-switcher" aria-label="Selettore tema">
+      <button data-theme="A">A</button>
+      <button data-theme="B">B</button>
+      <button data-theme="C">C</button>
+      <button data-theme="D">D</button>
+      <button data-theme="E">E</button>
+    </div>
+
+  </header>
+
+  <main class="room-main">
+    <section class="room-intro">
+      <h1>Diventare autore</h1>
+      <p>
+        Nella stanza della creazione lo studente passa dalla lettura alla scrittura:
+        produce testi, mappe integrate, riflessioni personali, piccoli saggi o narrazioni.
+      </p>
+    </section>
+
+    <section class="room-grid">
+      <div class="room-card full-width">
+        <h2>Editor di base</h2>
+        <p>Scrivi qui il tuo elaborato su Pascoli. Puoi organizzarlo in paragrafi e versioni successive.</p>
+        <textarea id="crea-editor" class="notebook-area" rows="14" placeholder="Inizia il tuo testo qui…"></textarea>
+        <div class="editor-actions">
+          <button id="crea-save" class="primary-btn">💾 Salva bozza</button>
+          <button id="crea-clear" class="secondary-btn">🗑️ Svuota</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function() {
+      const KEY = "libro0-crea-editor";
+      const area = document.getElementById("crea-editor");
+      const btnSave = document.getElementById("crea-save");
+      const btnClear = document.getElementById("crea-clear");
+      if (!area) return;
+      area.value = localStorage.getItem(KEY) || "";
+      btnSave.addEventListener("click", () => {
+        localStorage.setItem(KEY, area.value);
+        alert("Bozza salvata localmente.");
+      });
+      btnClear.addEventListener("click", () => {
+        if (confirm("Cancellare il testo dell'editor?")) {
+          area.value = "";
+          localStorage.removeItem(KEY);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

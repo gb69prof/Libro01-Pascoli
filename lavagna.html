@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Libro.0 – Stanza della lavagna</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="themes.css" />
+  <script src="themes.js" defer></script>
+  <script src="script-common.js" defer></script>
+</head>
+<body data-page="lavagna">
+  <!-- NAVBAR LIBRO.0 -->
+  <nav class="navbar-libro0">
+    <div class="nav-logo">
+      <a href="index.html">📘 Libro.0</a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="lettura.html">Lettura</a></li>
+      <li><a href="annota.html">Annota</a></li>
+      <li><a href="mappe.html">Mappe</a></li>
+      <li><a href="lavagna.html">Lavagna</a></li>
+      <li><a href="timeline.html">Timeline</a></li>
+      <li><a href="archivio.html">Archivio</a></li>
+      <li><a href="crea.html">Crea</a></li>
+      <li><a href="ricerca.html">Ricerca</a></li>
+    </ul>
+  </nav>
+
+
+  <header class="top-bar">
+    <div class="logo-area">
+      <span class="logo-main">Libro.0</span>
+      <span class="logo-sub">Stanza della lavagna</span>
+    </div>
+    <div class="theme-switcher" aria-label="Selettore tema">
+      <button data-theme="A">A</button>
+      <button data-theme="B">B</button>
+      <button data-theme="C">C</button>
+      <button data-theme="D">D</button>
+      <button data-theme="E">E</button>
+    </div>
+
+  </header>
+
+  <main class="room-main">
+    <section class="room-intro">
+      <h1>Lavagna digitale</h1>
+      <p>
+        Qui puoi disegnare schemi liberi, frecce, sottolineature: è lo spazio più vicino
+        alla lavagna d'aula. Il tratto è essenziale ma il gesto è quello giusto.
+      </p>
+    </section>
+
+    <section class="room-grid">
+      <div class="room-card full-width">
+        <h2>Area di disegno</h2>
+        <p>Usa il mouse o il dito (su tablet) per scrivere sulla lavagna.</p>
+        <div class="lavagna-toolbar">
+          <label>Spessore penna <input type="range" id="pen-size" min="1" max="12" value="3"></label>
+          <button id="lavagna-clear" class="secondary-btn">🧽 Pulisci</button>
+        </div>
+        <canvas id="lavagna-canvas" class="lavagna-canvas" width="900" height="500"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function() {
+      const canvas = document.getElementById("lavagna-canvas");
+      const ctx = canvas.getContext("2d");
+      const sizeInput = document.getElementById("pen-size");
+      const clearBtn = document.getElementById("lavagna-clear");
+      let drawing = false;
+      let lastX = 0, lastY = 0;
+
+      function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches ? e.touches[0] : e;
+        return {
+          x: touch.clientX - rect.left,
+          y: touch.clientY - rect.top
+        };
+      }
+
+      function start(e) {
+        e.preventDefault();
+        drawing = true;
+        const pos = getPos(e);
+        lastX = pos.x;
+        lastY = pos.y;
+      }
+
+      function move(e) {
+        if (!drawing) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        ctx.strokeStyle = "#111827";
+        ctx.lineWidth = Number(sizeInput.value || 3);
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+        lastX = pos.x;
+        lastY = pos.y;
+      }
+
+      function end() {
+        drawing = false;
+      }
+
+      canvas.addEventListener("mousedown", start);
+      canvas.addEventListener("mousemove", move);
+      document.addEventListener("mouseup", end);
+
+      canvas.addEventListener("touchstart", start, { passive:false });
+      canvas.addEventListener("touchmove", move, { passive:false });
+      canvas.addEventListener("touchend", end);
+
+      clearBtn.addEventListener("click", () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      });
+    })();
+  </script>
+</body>
+</html>
