@@ -199,7 +199,7 @@
     </div>
   </div>
 
-  <!-- Script evidenziazione + salvataggio locale -->
+  <!-- Script evidenziazione + salvataggio locale (versione robusta per iPad) -->
   <script>
     (function () {
       const HIGHLIGHT_STORAGE_KEY = "libro0_stupore_lesson_html";
@@ -210,7 +210,7 @@
 
       if (!lessonEl || !btnHighlight || !btnClear) return;
 
-      // Ripristina le evidenziazioni salvate
+      // 1. Ripristina le evidenziazioni salvate
       const savedHtml = localStorage.getItem(HIGHLIGHT_STORAGE_KEY);
       if (savedHtml) {
         lessonEl.innerHTML = savedHtml;
@@ -220,36 +220,34 @@
         localStorage.setItem(HIGHLIGHT_STORAGE_KEY, lessonEl.innerHTML);
       }
 
+      // 2. Evidenzia selezione
       btnHighlight.addEventListener("click", () => {
         const selection = window.getSelection();
-        if (!selection || !selection.rangeCount) {
-          return;
-        }
+        if (!selection || !selection.rangeCount) return;
 
         const range = selection.getRangeAt(0);
 
-        // Verifica che la selezione sia dentro la lesson-text
-        if (!lessonEl.contains(range.commonAncestorContainer)) {
-          return;
-        }
-
-        if (range.collapsed) {
-          return; // niente testo selezionato
-        }
+        // La selezione deve essere dentro il testo della lezione
+        if (!lessonEl.contains(range.commonAncestorContainer)) return;
+        if (range.collapsed) return; // niente testo selezionato
 
         const mark = document.createElement("mark");
         mark.classList.add("highlighted-text");
 
         try {
-          range.surroundContents(mark);
+          // Metodo più robusto: estrai il contenuto selezionato e reinseriscilo dentro <mark>
+          const contents = range.extractContents();
+          mark.appendChild(contents);
+          range.insertNode(mark);
+
           selection.removeAllRanges();
           saveHighlights();
         } catch (e) {
-          // Se la selezione è "spezzata" da altri elementi, surroundContents può lanciare errore.
           console.warn("Impossibile evidenziare questa selezione:", e);
         }
       });
 
+      // 3. Pulisci tutte le evidenziazioni
       btnClear.addEventListener("click", () => {
         const marks = lessonEl.querySelectorAll("mark.highlighted-text, mark");
         marks.forEach((m) => {
@@ -265,3 +263,4 @@
   </script>
 </body>
 </html>
+
