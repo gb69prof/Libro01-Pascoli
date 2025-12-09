@@ -8,6 +8,70 @@
   <link rel="stylesheet" href="themes.css" />
   <script src="themes.js" defer></script>
   <script src="script-common.js" defer></script>
+
+  <style>
+    /* Toolbar e canvas specifici della lavagna */
+    .lavagna-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .lavagna-toolbar label {
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .lavagna-toolbar input[type="range"] {
+      width: 140px;
+    }
+
+    .lavagna-colors {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+    }
+
+    .lavagna-color-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid rgba(0,0,0,0.35);
+      cursor: pointer;
+      padding: 0;
+      background-clip: padding-box;
+    }
+
+    .lavagna-color-dot.active {
+      box-shadow: 0 0 0 2px rgba(47,107,255,0.7);
+    }
+
+    .theme-D .lavagna-color-dot {
+      border-color: rgba(255,255,255,0.7);
+    }
+
+    #lavagna-canvas {
+      width: 100%;
+      max-width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.15);
+      background: #ffffff;
+      display: block;
+      margin: 0 auto;
+      touch-action: none; /* evita scroll/zoom con il dito */
+    }
+
+    .theme-D #lavagna-canvas {
+      background: #111111;
+      border-color: rgba(255,255,255,0.2);
+    }
+  </style>
 </head>
 <body data-page="lavagna">
   <!-- NAVBAR LIBRO.0 -->
@@ -28,7 +92,6 @@
     </ul>
   </nav>
 
-
   <header class="top-bar">
     <div class="logo-area">
       <span class="logo-main">Libro.0</span>
@@ -41,7 +104,6 @@
       <button data-theme="D">D</button>
       <button data-theme="E">E</button>
     </div>
-
   </header>
 
   <main class="room-main">
@@ -57,10 +119,36 @@
       <div class="room-card full-width">
         <h2>Area di disegno</h2>
         <p>Usa il mouse o il dito (su tablet) per scrivere sulla lavagna.</p>
+
         <div class="lavagna-toolbar">
-          <label>Spessore penna <input type="range" id="pen-size" min="1" max="12" value="3"></label>
+          <div class="lavagna-colors">
+            <span>Colore penna:</span>
+            <button type="button"
+                    class="lavagna-color-dot active"
+                    data-pen-color="#000000"
+                    style="background:#000000;"></button>
+            <button type="button"
+                    class="lavagna-color-dot"
+                    data-pen-color="#d62828"
+                    style="background:#d62828;"></button>
+            <button type="button"
+                    class="lavagna-color-dot"
+                    data-pen-color="#1d4ed8"
+                    style="background:#1d4ed8;"></button>
+            <button type="button"
+                    class="lavagna-color-dot"
+                    data-pen-color="#16a34a"
+                    style="background:#16a34a;"></button>
+          </div>
+
+          <label>
+            Spessore penna
+            <input type="range" id="pen-size" min="1" max="12" value="3">
+          </label>
+
           <button id="lavagna-clear" class="secondary-btn">🧽 Pulisci</button>
         </div>
+
         <canvas id="lavagna-canvas" class="lavagna-canvas" width="900" height="500"></canvas>
       </div>
     </section>
@@ -72,15 +160,40 @@
       const ctx = canvas.getContext("2d");
       const sizeInput = document.getElementById("pen-size");
       const clearBtn = document.getElementById("lavagna-clear");
+      const colorButtons = document.querySelectorAll(".lavagna-color-dot");
+
       let drawing = false;
       let lastX = 0, lastY = 0;
+      let currentColor = "#000000";
 
+      // Gestione selezione colore penna
+      function setActiveColorButton(btn) {
+        colorButtons.forEach(b => b.classList.remove("active"));
+        if (btn) btn.classList.add("active");
+      }
+
+      colorButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const color = btn.getAttribute("data-pen-color") || "#000000";
+          currentColor = color;
+          setActiveColorButton(btn);
+        });
+      });
+
+      // Default: primo bottone (nero)
+      setActiveColorButton(colorButtons[0]);
+
+      // Calcolo posizione con correzione di scala (fondamentale per il dito)
       function getPos(e) {
         const rect = canvas.getBoundingClientRect();
         const touch = e.touches ? e.touches[0] : e;
+
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
         return {
-          x: touch.clientX - rect.left,
-          y: touch.clientY - rect.top
+          x: (touch.clientX - rect.left) * scaleX,
+          y: (touch.clientY - rect.top) * scaleY
         };
       }
 
@@ -96,13 +209,17 @@
         if (!drawing) return;
         e.preventDefault();
         const pos = getPos(e);
-        ctx.strokeStyle = "#111827";
+
+        ctx.strokeStyle = currentColor;
         ctx.lineWidth = Number(sizeInput.value || 3);
         ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
         ctx.lineTo(pos.x, pos.y);
         ctx.stroke();
+
         lastX = pos.x;
         lastY = pos.y;
       }
@@ -115,8 +232,8 @@
       canvas.addEventListener("mousemove", move);
       document.addEventListener("mouseup", end);
 
-      canvas.addEventListener("touchstart", start, { passive:false });
-      canvas.addEventListener("touchmove", move, { passive:false });
+      canvas.addEventListener("touchstart", start, { passive: false });
+      canvas.addEventListener("touchmove", move, { passive: false });
       canvas.addEventListener("touchend", end);
 
       clearBtn.addEventListener("click", () => {
