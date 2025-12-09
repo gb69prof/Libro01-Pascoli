@@ -28,7 +28,6 @@
     </ul>
   </nav>
 
-
   <header class="top-bar">
     <div class="logo-area">
       <span class="logo-main">Libro.0</span>
@@ -41,7 +40,6 @@
       <button data-theme="D">D</button>
       <button data-theme="E">E</button>
     </div>
-
   </header>
 
   <main class="room-main">
@@ -60,12 +58,26 @@
           Trascina i nodi per organizzare il pensiero nello spazio. I dati non vengono salvati,
           ma il gesto è già quello della mappa concettuale.
         </p>
+
         <div id="mappe-canvas" class="mappe-canvas">
+          <!-- Riga 1 -->
           <div class="map-node" style="top:20px; left:20px;">Pascoli</div>
-          <div class="map-node" style="top:120px; left:160px;">Stupore</div>
-          <div class="map-node" style="top:200px; left:40px;">Visione del mondo</div>
-          <div class="map-node" style="top:260px; left:260px;">Fanciullino</div>
-          <div class="map-node" style="top:80px; left:320px;">Simbolismo</div>
+          <div class="map-node" style="top:20px; left:220px;">Sentimento base</div>
+          <div class="map-node" style="top:20px; left:440px;">Stupore</div>
+
+          <!-- Riga 2 -->
+          <div class="map-node" style="top:130px; left:20px;">Paura</div>
+          <div class="map-node" style="top:130px; left:220px;">Visione del mondo</div>
+          <div class="map-node" style="top:130px; left:440px;">Contro la scienza</div>
+
+          <!-- Riga 3 -->
+          <div class="map-node" style="top:240px; left:20px;">Socialismo-nazionalismo</div>
+          <div class="map-node" style="top:240px; left:260px;">Fanciullino</div>
+          <div class="map-node" style="top:240px; left:480px;">Poetica</div>
+
+          <!-- Riga 4 -->
+          <div class="map-node" style="top:350px; left:120px;">Fiore</div>
+          <div class="map-node" style="top:350px; left:360px;">Simbolismo</div>
         </div>
       </div>
     </section>
@@ -79,7 +91,7 @@
 
       nodes.forEach(node => {
         node.addEventListener("mousedown", startDrag);
-        node.addEventListener("touchstart", startDrag, { passive:false });
+        node.addEventListener("touchstart", startDrag, { passive: false });
       });
 
       function startDrag(e) {
@@ -92,7 +104,7 @@
         offsetY = clientY - rect.top;
         document.addEventListener("mousemove", onMove);
         document.addEventListener("mouseup", endDrag);
-        document.addEventListener("touchmove", onMove, { passive:false });
+        document.addEventListener("touchmove", onMove, { passive: false });
         document.addEventListener("touchend", endDrag);
       }
 
