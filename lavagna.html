@@ -56,6 +56,41 @@
       border-color: rgba(255,255,255,0.7);
     }
 
+    .lavagna-tools-mode {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .lavagna-tool {
+      font-size: 0.85rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,0.2);
+      background: rgba(255,255,255,0.9);
+      cursor: pointer;
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+
+    .lavagna-tool.active {
+      background: #2f6bff;
+      color: #ffffff;
+      border-color: transparent;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    .theme-D .lavagna-tool {
+      background: rgba(15,15,15,0.9);
+      color: #f5f5f5;
+      border-color: rgba(255,255,255,0.35);
+    }
+
+    .theme-D .lavagna-tool.active {
+      background: #4b82ff;
+      border-color: transparent;
+      color: #ffffff;
+    }
+
     #lavagna-canvas {
       width: 100%;
       max-width: 100%;
@@ -111,7 +146,8 @@
       <h1>Lavagna digitale</h1>
       <p>
         Qui puoi disegnare schemi liberi, frecce, sottolineature: è lo spazio più vicino
-        alla lavagna d'aula. Il tratto è essenziale ma il gesto è quello giusto.
+        alla lavagna d'aula. Il tratto segue il dito, puoi cambiare colore e usare la gomma
+        per correggere solo ciò che ti serve.
       </p>
     </section>
 
@@ -142,11 +178,16 @@
           </div>
 
           <label>
-            Spessore penna
-            <input type="range" id="pen-size" min="1" max="12" value="3">
+            Spessore
+            <input type="range" id="pen-size" min="1" max="18" value="4">
           </label>
 
-          <button id="lavagna-clear" class="secondary-btn">🧽 Pulisci</button>
+          <div class="lavagna-tools-mode">
+            <button id="lavagna-pen" class="lavagna-tool active" type="button">✏️ Penna</button>
+            <button id="lavagna-eraser" class="lavagna-tool" type="button">🩹 Gomma</button>
+          </div>
+
+          <button id="lavagna-clear" class="secondary-btn" type="button">🧽 Pulisci</button>
         </div>
 
         <canvas id="lavagna-canvas" class="lavagna-canvas" width="900" height="500"></canvas>
@@ -161,10 +202,13 @@
       const sizeInput = document.getElementById("pen-size");
       const clearBtn = document.getElementById("lavagna-clear");
       const colorButtons = document.querySelectorAll(".lavagna-color-dot");
+      const penBtn = document.getElementById("lavagna-pen");
+      const eraserBtn = document.getElementById("lavagna-eraser");
 
       let drawing = false;
       let lastX = 0, lastY = 0;
       let currentColor = "#000000";
+      let mode = "pen"; // "pen" | "eraser"
 
       // Gestione selezione colore penna
       function setActiveColorButton(btn) {
@@ -177,11 +221,27 @@
           const color = btn.getAttribute("data-pen-color") || "#000000";
           currentColor = color;
           setActiveColorButton(btn);
+          // se sto cambiando colore, la modalità resta penna (non forzo, ma avrebbe senso)
         });
       });
 
       // Default: primo bottone (nero)
       setActiveColorButton(colorButtons[0]);
+
+      // Toggle Penna / Gomma
+      function setMode(newMode) {
+        mode = newMode;
+        if (mode === "pen") {
+          penBtn.classList.add("active");
+          eraserBtn.classList.remove("active");
+        } else {
+          eraserBtn.classList.add("active");
+          penBtn.classList.remove("active");
+        }
+      }
+
+      penBtn.addEventListener("click", () => setMode("pen"));
+      eraserBtn.addEventListener("click", () => setMode("eraser"));
 
       // Calcolo posizione con correzione di scala (fondamentale per il dito)
       function getPos(e) {
@@ -210,15 +270,27 @@
         e.preventDefault();
         const pos = getPos(e);
 
-        ctx.strokeStyle = currentColor;
-        ctx.lineWidth = Number(sizeInput.value || 3);
+        ctx.lineWidth = Number(sizeInput.value || 4);
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
+
+        ctx.save();
+
+        if (mode === "eraser") {
+          // Cancella solo dove passa: destination-out
+          ctx.globalCompositeOperation = "destination-out";
+          ctx.strokeStyle = "rgba(0,0,0,1)";
+        } else {
+          ctx.globalCompositeOperation = "source-over";
+          ctx.strokeStyle = currentColor;
+        }
 
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
         ctx.lineTo(pos.x, pos.y);
         ctx.stroke();
+
+        ctx.restore();
 
         lastX = pos.x;
         lastY = pos.y;
@@ -238,8 +310,10 @@
 
       clearBtn.addEventListener("click", () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.globalCompositeOperation = "source-over";
       });
     })();
   </script>
 </body>
 </html>
+
