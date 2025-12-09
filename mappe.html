@@ -8,6 +8,287 @@
   <link rel="stylesheet" href="themes.css" />
   <script src="themes.js" defer></script>
   <script src="script-common.js" defer></script>
+
+  <style>
+    /* Layout specifico stanza Mappe */
+    .mappe-layout {
+      display: grid;
+      grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+      gap: 1.5rem;
+      align-items: stretch;
+    }
+
+    @media (max-width: 900px) {
+      .mappe-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .map-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .map-controls form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .map-controls label {
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+
+    .map-controls input[type="text"],
+    .map-controls select,
+    .map-controls textarea {
+      width: 100%;
+      font-size: 0.9rem;
+      padding: 0.35rem 0.5rem;
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,0.2);
+      background: rgba(255,255,255,0.9);
+    }
+
+    .theme-D .map-controls input[type="text"],
+    .theme-D .map-controls select,
+    .theme-D .map-controls textarea {
+      background: rgba(10,10,10,0.9);
+      color: #f5f5f5;
+      border-color: rgba(255,255,255,0.25);
+    }
+
+    .map-controls textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+
+    .map-controls-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+
+    .map-btn {
+      font-size: 0.85rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,0.2);
+      background: rgba(255,255,255,0.9);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+    }
+
+    .map-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    .map-btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .map-btn-primary {
+      border-color: transparent;
+      background: #2f6bff;
+      color: #fff;
+    }
+
+    .theme-D .map-btn {
+      background: rgba(15,15,15,0.9);
+      color: #f5f5f5;
+      border-color: rgba(255,255,255,0.35);
+    }
+
+    .theme-D .map-btn-primary {
+      background: #4b82ff;
+      border-color: transparent;
+    }
+
+    .map-status {
+      font-size: 0.8rem;
+      opacity: 0.8;
+      margin-top: 0.25rem;
+    }
+
+    .map-hint-list {
+      font-size: 0.8rem;
+      padding-left: 1.2rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Canvas mappa */
+    .map-canvas-wrapper {
+      position: relative;
+      min-height: 420px;
+      overflow: hidden;
+    }
+
+    #mappe-canvas {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 420px;
+      border-radius: 14px;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.95), rgba(230,230,230,0.9));
+      overflow: hidden;
+    }
+
+    .theme-D #mappe-canvas {
+      background: radial-gradient(circle at top, #1a1a1a, #050505);
+    }
+
+    /* Connessioni (svg) */
+    #map-connections {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    #map-connections line {
+      stroke-width: 2px;
+      stroke: rgba(70,70,70,0.75);
+    }
+
+    .theme-D #map-connections line {
+      stroke: rgba(220,220,220,0.85);
+    }
+
+    /* Nodi */
+    .map-node {
+      position: absolute;
+      padding: 0.35rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      line-height: 1.2;
+      cursor: grab;
+      user-select: none;
+      border: 1px solid rgba(0,0,0,0.25);
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+      white-space: nowrap;
+      max-width: 220px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .map-node:active {
+      cursor: grabbing;
+    }
+
+    .map-node.selected {
+      box-shadow: 0 0 0 2px #2f6bff;
+      border-color: #2f6bff;
+    }
+
+    .map-node.link-source {
+      box-shadow: 0 0 0 2px #f39c12;
+      border-color: #f39c12;
+    }
+
+    .map-node.link-target {
+      box-shadow: 0 0 0 2px #27ae60;
+      border-color: #27ae60;
+    }
+
+    /* Colori per categoria */
+    .map-node[data-category="concetto"] {
+      background: #fffdf2;
+      border-color: #f0d36a;
+    }
+
+    .map-node[data-category="emozione"] {
+      background: #eaf4ff;
+      border-color: #6fa8ff;
+    }
+
+    .map-node[data-category="politica"] {
+      background: #ffecec;
+      border-color: #ff8b8b;
+    }
+
+    .map-node[data-category="poetica"] {
+      background: #f3e8ff;
+      border-color: #b48dff;
+    }
+
+    .map-node[data-category="simbolo"] {
+      background: #e9fff4;
+      border-color: #7ed3a6;
+    }
+
+    .theme-D .map-node {
+      background: rgba(20,20,20,0.95);
+      color: #f5f5f5;
+      border-color: rgba(255,255,255,0.25);
+    }
+
+    .theme-D .map-node[data-category="concetto"] {
+      background: #50451e;
+      border-color: #f0d36a;
+    }
+
+    .theme-D .map-node[data-category="emozione"] {
+      background: #1f3448;
+      border-color: #6fa8ff;
+    }
+
+    .theme-D .map-node[data-category="politica"] {
+      background: #4b1f1f;
+      border-color: #ff8b8b;
+    }
+
+    .theme-D .map-node[data-category="poetica"] {
+      background: #3a254e;
+      border-color: #b48dff;
+    }
+
+    .theme-D .map-node[data-category="simbolo"] {
+      background: #173a28;
+      border-color: #7ed3a6;
+    }
+
+    .map-node-note-indicator {
+      margin-left: 0.35rem;
+      font-size: 0.75rem;
+      opacity: 0.75;
+    }
+
+    .map-node:hover .map-node-note-indicator {
+      opacity: 1;
+    }
+
+    /* Tooltip nota (semplice) */
+    .map-node[data-note]:hover::after {
+      content: attr(data-note);
+      position: absolute;
+      left: 50%;
+      top: 120%;
+      transform: translateX(-50%);
+      max-width: 240px;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.75rem;
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      border-radius: 8px;
+      white-space: normal;
+      z-index: 10;
+    }
+
+    .theme-D .map-node[data-note]:hover::after {
+      background: rgba(255,255,255,0.95);
+      color: #111;
+    }
+  </style>
 </head>
 <body data-page="mappe">
   <!-- NAVBAR LIBRO.0 -->
@@ -44,40 +325,79 @@
 
   <main class="room-main">
     <section class="room-intro">
-      <h1>Mappe concettuali</h1>
+      <h1>Mappe concettuali – editor Libro.0</h1>
       <p>
-        Qui il materiale della lettura viene trasformato in struttura: nodi, frecce, categorie.
-        Nel prototipo trovi un semplice schema di nodi testuali trascinabili.
+        Qui puoi costruire e modificare una mappa concettuale viva. I nodi sono trascinabili,
+        puoi crearne di nuovi, collegarli con linee e aggiungere note. Tutto è salvato nel
+        browser: quando torni, la mappa è ancora lì.
       </p>
     </section>
 
-    <section class="room-grid">
-      <div class="room-card full-width">
-        <h2>Mappa rapida (demo locale)</h2>
-        <p>
-          Trascina i nodi per organizzare il pensiero nello spazio. I dati non vengono salvati,
-          ma il gesto è già quello della mappa concettuale.
+    <section class="room-grid mappe-layout">
+      <!-- PANNELLO DI CONTROLLO -->
+      <div class="room-card map-controls">
+        <h2>Strumenti mappa</h2>
+
+        <form id="add-node-form">
+          <div>
+            <label for="node-label">Testo del nodo</label>
+            <input id="node-label" type="text" placeholder="Es. Sentimento base" required />
+          </div>
+
+          <div>
+            <label for="node-category">Categoria</label>
+            <select id="node-category">
+              <option value="concetto">Concetto</option>
+              <option value="emozione">Emozione</option>
+              <option value="politica">Politica</option>
+              <option value="poetica">Poetica</option>
+              <option value="simbolo">Simbolo</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="node-note">Nota (facoltativa)</label>
+            <textarea id="node-note" placeholder="Spiega il ruolo del nodo nella mappa..."></textarea>
+          </div>
+
+          <div class="map-controls-buttons">
+            <button type="submit" class="map-btn map-btn-primary">
+              ➕ Aggiungi nodo
+            </button>
+          </div>
+        </form>
+
+        <div class="map-controls-buttons">
+          <button id="btn-delete-node" class="map-btn" type="button">
+            🗑️ Elimina nodo selezionato
+          </button>
+          <button id="btn-toggle-link-mode" class="map-btn" type="button">
+            🔗 Modalità collega nodi (OFF)
+          </button>
+          <button id="btn-reset-map" class="map-btn" type="button">
+            ♻️ Ripristina mappa iniziale
+          </button>
+        </div>
+
+        <p class="map-status" id="map-status">
+          Nessun nodo selezionato. Trascina i nodi nello spazio, fai clic per selezionare.
         </p>
 
-        <div id="mappe-canvas" class="mappe-canvas">
-          <!-- Riga 1 -->
-          <div class="map-node" style="top:20px; left:20px;">Pascoli</div>
-          <div class="map-node" style="top:20px; left:220px;">Sentimento base</div>
-          <div class="map-node" style="top:20px; left:440px;">Stupore</div>
+        <h3>Come usare l’editor</h3>
+        <ul class="map-hint-list">
+          <li>Trascina i nodi nello spazio per dare forma al pensiero.</li>
+          <li>Clic su un nodo → lo selezioni (per eliminarlo o modificarlo).</li>
+          <li>Doppio clic su un nodo → puoi cambiare testo e nota.</li>
+          <li>“Modalità collega nodi”: clic nodo A, poi nodo B → appare una linea.</li>
+          <li>La mappa viene salvata automaticamente in questo browser.</li>
+        </ul>
+      </div>
 
-          <!-- Riga 2 -->
-          <div class="map-node" style="top:130px; left:20px;">Paura</div>
-          <div class="map-node" style="top:130px; left:220px;">Visione del mondo</div>
-          <div class="map-node" style="top:130px; left:440px;">Contro la scienza</div>
-
-          <!-- Riga 3 -->
-          <div class="map-node" style="top:240px; left:20px;">Socialismo-nazionalismo</div>
-          <div class="map-node" style="top:240px; left:260px;">Fanciullino</div>
-          <div class="map-node" style="top:240px; left:480px;">Poetica</div>
-
-          <!-- Riga 4 -->
-          <div class="map-node" style="top:350px; left:120px;">Fiore</div>
-          <div class="map-node" style="top:350px; left:360px;">Simbolismo</div>
+      <!-- CANVAS DELLA MAPPA -->
+      <div class="room-card map-canvas-wrapper">
+        <div id="mappe-canvas">
+          <svg id="map-connections"></svg>
+          <!-- I nodi vengono creati via JS -->
         </div>
       </div>
     </section>
@@ -85,49 +405,387 @@
 
   <script>
     (function() {
-      const nodes = document.querySelectorAll(".map-node");
-      let active = null;
-      let offsetX = 0, offsetY = 0;
+      const STORAGE_KEY = "libro0_map_pascoli";
 
-      nodes.forEach(node => {
-        node.addEventListener("mousedown", startDrag);
-        node.addEventListener("touchstart", startDrag, { passive: false });
+      // Mappa di default (Pascoli) – usata solo se non c'è nulla salvato
+      const DEFAULT_MAP = {
+        nodes: [
+          { id: "n1",  label: "Pascoli",                x: 80,  y: 40,  category: "concetto", note: "" },
+          { id: "n2",  label: "Sentimento base",        x: 280, y: 40,  category: "emozione", note: "" },
+          { id: "n3",  label: "Stupore",                x: 500, y: 40,  category: "emozione", note: "" },
+          { id: "n4",  label: "Paura",                  x: 80,  y: 150, category: "emozione", note: "" },
+          { id: "n5",  label: "Visione del mondo",      x: 280, y: 150, category: "concetto", note: "" },
+          { id: "n6",  label: "Contro la scienza",      x: 500, y: 150, category: "politica", note: "" },
+          { id: "n7",  label: "Socialismo-nazionalismo",x: 80,  y: 260, category: "politica", note: "" },
+          { id: "n8",  label: "Fanciullino",            x: 320, y: 260, category: "poetica",  note: "" },
+          { id: "n9",  label: "Poetica",                x: 540, y: 260, category: "poetica",  note: "" },
+          { id: "n10", label: "Fiore",                  x: 200, y: 360, category: "simbolo",  note: "" },
+          { id: "n11", label: "Simbolismo",             x: 420, y: 360, category: "simbolo",  note: "" }
+        ],
+        links: [
+          { from: "n1", to: "n2" },
+          { from: "n2", to: "n3" },
+          { from: "n2", to: "n4" },
+          { from: "n1", to: "n5" },
+          { from: "n5", to: "n6" },
+          { from: "n6", to: "n7" },
+          { from: "n5", to: "n8" },
+          { from: "n8", to: "n9" },
+          { from: "n9", to: "n10" },
+          { from: "n10",to: "n11" }
+        ]
+      };
+
+      let mapData = null;
+      let selectedNodeId = null;
+      let linkMode = false;
+      let pendingLinkSourceId = null;
+
+      const canvas = document.getElementById("mappe-canvas");
+      const svg = document.getElementById("map-connections");
+      const statusEl = document.getElementById("map-status");
+
+      const form = document.getElementById("add-node-form");
+      const inputLabel = document.getElementById("node-label");
+      const inputCategory = document.getElementById("node-category");
+      const inputNote = document.getElementById("node-note");
+      const btnDelete = document.getElementById("btn-delete-node");
+      const btnLinkMode = document.getElementById("btn-toggle-link-mode");
+      const btnReset = document.getElementById("btn-reset-map");
+
+      function loadMap() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) {
+            mapData = structuredClone(DEFAULT_MAP);
+          } else {
+            mapData = JSON.parse(raw);
+            if (!mapData.nodes) mapData.nodes = [];
+            if (!mapData.links) mapData.links = [];
+          }
+        } catch (e) {
+          console.error("Errore caricamento mappa, uso default", e);
+          mapData = structuredClone(DEFAULT_MAP);
+        }
+      }
+
+      function saveMap() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(mapData));
+        } catch (e) {
+          console.error("Errore salvataggio mappa", e);
+        }
+      }
+
+      function clearCanvas() {
+        // Rimuovo nodi
+        const nodes = canvas.querySelectorAll(".map-node");
+        nodes.forEach(n => n.remove());
+        // Rimuovo linee
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
+      }
+
+      function render() {
+        clearCanvas();
+        // Disegno nodi
+        mapData.nodes.forEach(node => {
+          const el = document.createElement("div");
+          el.className = "map-node";
+          el.dataset.id = node.id;
+          el.dataset.category = node.category || "concetto";
+          if (node.note) {
+            el.dataset.note = node.note;
+          }
+
+          el.style.left = (node.x || 50) + "px";
+          el.style.top  = (node.y || 50) + "px";
+
+          // Testo + indicatore nota
+          const textSpan = document.createElement("span");
+          textSpan.textContent = node.label;
+          el.appendChild(textSpan);
+
+          if (node.note) {
+            const noteSpan = document.createElement("span");
+            noteSpan.className = "map-node-note-indicator";
+            noteSpan.textContent = "●";
+            el.appendChild(noteSpan);
+          }
+
+          // Selezione
+          el.addEventListener("click", (ev) => {
+            ev.stopPropagation();
+            handleNodeClick(node.id);
+          });
+
+          // Doppio click = modifica nodo
+          el.addEventListener("dblclick", (ev) => {
+            ev.stopPropagation();
+            editNode(node.id);
+          });
+
+          // Drag
+          makeDraggable(el, node.id);
+
+          canvas.appendChild(el);
+        });
+
+        // Disegno link
+        mapData.links.forEach(link => {
+          const fromNode = canvas.querySelector('.map-node[data-id="' + link.from + '"]');
+          const toNode   = canvas.querySelector('.map-node[data-id="' + link.to   + '"]');
+          if (!fromNode || !toNode) return;
+
+          const fromPos = getNodeCenter(fromNode);
+          const toPos   = getNodeCenter(toNode);
+
+          const line = document.createElementNS("http://www.w3.org/2000/svg","line");
+          line.setAttribute("x1", fromPos.x);
+          line.setAttribute("y1", fromPos.y);
+          line.setAttribute("x2", toPos.x);
+          line.setAttribute("y2", toPos.y);
+          svg.appendChild(line);
+        });
+
+        updateSelectionStyles();
+        updateStatus();
+      }
+
+      function getNodeCenter(el) {
+        const canvasRect = canvas.getBoundingClientRect();
+        const rect = el.getBoundingClientRect();
+        const x = rect.left - canvasRect.left + rect.width / 2;
+        const y = rect.top  - canvasRect.top  + rect.height / 2;
+        return { x, y };
+      }
+
+      function updateLinks() {
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
+        mapData.links.forEach(link => {
+          const fromNode = canvas.querySelector('.map-node[data-id="' + link.from + '"]');
+          const toNode   = canvas.querySelector('.map-node[data-id="' + link.to   + '"]');
+          if (!fromNode || !toNode) return;
+          const fromPos = getNodeCenter(fromNode);
+          const toPos   = getNodeCenter(toNode);
+          const line = document.createElementNS("http://www.w3.org/2000/svg","line");
+          line.setAttribute("x1", fromPos.x);
+          line.setAttribute("y1", fromPos.y);
+          line.setAttribute("x2", toPos.x);
+          line.setAttribute("y2", toPos.y);
+          svg.appendChild(line);
+        });
+      }
+
+      function handleNodeClick(id) {
+        if (linkMode) {
+          if (!pendingLinkSourceId) {
+            // Primo nodo (sorgente)
+            pendingLinkSourceId = id;
+          } else if (pendingLinkSourceId === id) {
+            // Clic sullo stesso nodo -> annulla
+            pendingLinkSourceId = null;
+          } else {
+            // Secondo nodo -> crea link
+            mapData.links.push({ from: pendingLinkSourceId, to: id });
+            pendingLinkSourceId = null;
+            saveMap();
+            render();
+          }
+        } else {
+          selectedNodeId = id;
+          pendingLinkSourceId = null;
+          updateSelectionStyles();
+          updateStatus();
+        }
+      }
+
+      function updateSelectionStyles() {
+        const nodes = canvas.querySelectorAll(".map-node");
+        nodes.forEach(n => {
+          n.classList.remove("selected", "link-source", "link-target");
+          const id = n.dataset.id;
+          if (id === selectedNodeId) {
+            n.classList.add("selected");
+          }
+          if (linkMode && pendingLinkSourceId && id === pendingLinkSourceId) {
+            n.classList.add("link-source");
+          }
+        });
+      }
+
+      function updateStatus() {
+        if (linkMode) {
+          if (pendingLinkSourceId) {
+            const node = mapData.nodes.find(n => n.id === pendingLinkSourceId);
+            statusEl.textContent = "Collega nodi: hai scelto come sorgente \"" + (node?.label || "") + "\", ora clicca un altro nodo per creare il collegamento.";
+          } else {
+            statusEl.textContent = "Modalità collega nodi ATTIVA. Clicca un nodo sorgente, poi un nodo destinazione.";
+          }
+          return;
+        }
+
+        if (!selectedNodeId) {
+          statusEl.textContent = "Nessun nodo selezionato. Clicca un nodo per selezionarlo.";
+        } else {
+          const node = mapData.nodes.find(n => n.id === selectedNodeId);
+          statusEl.textContent = "Nodo selezionato: \"" + (node?.label || "") + "\" – doppio clic per modificare testo e nota.";
+        }
+      }
+
+      function editNode(id) {
+        const node = mapData.nodes.find(n => n.id === id);
+        if (!node) return;
+        const newLabel = prompt("Testo del nodo:", node.label);
+        if (newLabel === null) return;
+        node.label = newLabel.trim() || node.label;
+        const newNote = prompt("Nota (facoltativa, lascia vuoto per eliminare):", node.note || "");
+        if (newNote === null) {
+          // non cambia
+        } else {
+          node.note = newNote.trim();
+        }
+        saveMap();
+        render();
+      }
+
+      function deleteSelectedNode() {
+        if (!selectedNodeId) return;
+        const node = mapData.nodes.find(n => n.id === selectedNodeId);
+        if (!node) return;
+        if (!confirm('Vuoi davvero eliminare il nodo "' + node.label + '" e i suoi collegamenti?')) return;
+
+        mapData.nodes = mapData.nodes.filter(n => n.id !== selectedNodeId);
+        mapData.links = mapData.links.filter(l => l.from !== selectedNodeId && l.to !== selectedNodeId);
+        selectedNodeId = null;
+        pendingLinkSourceId = null;
+        saveMap();
+        render();
+      }
+
+      function toggleLinkMode() {
+        linkMode = !linkMode;
+        pendingLinkSourceId = null;
+        btnLinkMode.textContent = linkMode ? "🔗 Modalità collega nodi (ON)" : "🔗 Modalità collega nodi (OFF)";
+        updateSelectionStyles();
+        updateStatus();
+      }
+
+      function resetMap() {
+        if (!confirm("Ripristinare la mappa iniziale di Pascoli? Perderai tutte le modifiche.")) return;
+        mapData = structuredClone(DEFAULT_MAP);
+        selectedNodeId = null;
+        pendingLinkSourceId = null;
+        linkMode = false;
+        btnLinkMode.textContent = "🔗 Modalità collega nodi (OFF)";
+        saveMap();
+        render();
+      }
+
+      function createNode(label, category, note) {
+        const id = "n" + Date.now().toString(36);
+        // posizione di default: centro approssimato
+        const rect = canvas.getBoundingClientRect();
+        const x = (rect.width / 2)  - 60;
+        const y = (rect.height / 2) - 20;
+        const node = { id, label, category, note, x, y };
+        mapData.nodes.push(node);
+        saveMap();
+        render();
+      }
+
+      function makeDraggable(el, nodeId) {
+        let isDown = false;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        const onMouseDown = (e) => {
+          e.preventDefault();
+          isDown = true;
+          const rect = el.getBoundingClientRect();
+          const bounds = canvas.getBoundingClientRect();
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          offsetX = clientX - rect.left;
+          offsetY = clientY - rect.top;
+
+          document.addEventListener("mousemove", onMouseMove);
+          document.addEventListener("mouseup", onMouseUp);
+          document.addEventListener("touchmove", onMouseMove, { passive: false });
+          document.addEventListener("touchend", onMouseUp);
+        };
+
+        const onMouseMove = (e) => {
+          if (!isDown) return;
+          e.preventDefault();
+          const bounds = canvas.getBoundingClientRect();
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          let x = clientX - bounds.left - offsetX;
+          let y = clientY - bounds.top  - offsetY;
+
+          el.style.left = x + "px";
+          el.style.top  = y + "px";
+
+          // aggiorna dati del nodo
+          const node = mapData.nodes.find(n => n.id === nodeId);
+          if (node) {
+            node.x = x;
+            node.y = y;
+          }
+          updateLinks();
+        };
+
+        const onMouseUp = (e) => {
+          if (!isDown) return;
+          isDown = false;
+          document.removeEventListener("mousemove", onMouseMove);
+          document.removeEventListener("mouseup", onMouseUp);
+          document.removeEventListener("touchmove", onMouseMove);
+          document.removeEventListener("touchend", onMouseUp);
+          saveMap();
+        };
+
+        el.addEventListener("mousedown", onMouseDown);
+        el.addEventListener("touchstart", onMouseDown, { passive: false });
+      }
+
+      // Eventi UI
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const label = inputLabel.value.trim();
+        if (!label) return;
+        const category = inputCategory.value || "concetto";
+        const note = inputNote.value.trim();
+        createNode(label, category, note);
+        inputLabel.value = "";
+        inputNote.value = "";
       });
 
-      function startDrag(e) {
-        e.preventDefault();
-        active = e.currentTarget;
-        const rect = active.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        offsetX = clientX - rect.left;
-        offsetY = clientY - rect.top;
-        document.addEventListener("mousemove", onMove);
-        document.addEventListener("mouseup", endDrag);
-        document.addEventListener("touchmove", onMove, { passive: false });
-        document.addEventListener("touchend", endDrag);
-      }
+      btnDelete.addEventListener("click", () => {
+        deleteSelectedNode();
+      });
 
-      function onMove(e) {
-        if (!active) return;
-        const canvas = document.getElementById("mappe-canvas");
-        const bounds = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        let x = clientX - bounds.left - offsetX;
-        let y = clientY - bounds.top - offsetY;
-        active.style.left = x + "px";
-        active.style.top = y + "px";
-      }
+      btnLinkMode.addEventListener("click", () => {
+        toggleLinkMode();
+      });
 
-      function endDrag() {
-        active = null;
-        document.removeEventListener("mousemove", onMove);
-        document.removeEventListener("mouseup", endDrag);
-        document.removeEventListener("touchmove", onMove);
-        document.removeEventListener("touchend", endDrag);
-      }
+      btnReset.addEventListener("click", () => {
+        resetMap();
+      });
+
+      // Clic sul canvas vuoto = deseleziona
+      canvas.addEventListener("click", () => {
+        selectedNodeId = null;
+        pendingLinkSourceId = null;
+        updateSelectionStyles();
+        updateStatus();
+      });
+
+      // Init
+      loadMap();
+      render();
     })();
   </script>
 </body>
 </html>
+
