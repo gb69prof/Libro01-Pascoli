@@ -28,7 +28,6 @@
     </ul>
   </nav>
 
-
   <header class="top-bar">
     <div class="logo-area">
       <span class="logo-main">Libro.0</span>
@@ -41,51 +40,80 @@
       <button data-theme="D">D</button>
       <button data-theme="E">E</button>
     </div>
-
   </header>
 
   <main class="search-layout">
+    <!-- COLONNA SINISTRA: RICERCA -->
     <section class="search-left">
       <h1>Ricerca integrata</h1>
       <p>
-        Questa pagina unisce ricerca interna e navigazione esterna, senza uscire dal Libro.0.
-        Nel prototipo, i risultati sono esempi statici e il browser integrato carica l'URL
-        che inserisci nella barra.
+        Questa pagina unisce la ricerca <strong>all’interno del Libro.0</strong> e la
+        navigazione esterna, senza uscire dalla cornice del progetto.
       </p>
 
-      <form id="url-form" class="url-form">
-        <label for="url-input">Apri un indirizzo web</label>
-        <div class="url-row">
-          <input id="url-input" type="text" placeholder="https://…" />
-          <button type="submit" class="primary-btn">Apri</button>
+      <!-- RICERCA INTERNA -->
+      <section class="search-internal">
+        <h2>Ricerca nel Libro.0</h2>
+        <form id="internal-search-form" class="url-form" autocomplete="off">
+          <label for="internal-query">Cerca tra lezioni, testi e stanze</label>
+          <div class="url-row">
+            <input
+              id="internal-query"
+              type="text"
+              placeholder="Es. fiore, simbolismo, gelsomino, lavagna…"
+            />
+            <button type="submit" class="primary-btn">Cerca</button>
+          </div>
+        </form>
+
+        <div id="internal-results" class="search-results">
+          <p class="small" id="internal-results-info">
+            Digita una parola chiave per cercare tra le pagine del Libro.0.
+          </p>
+          <ul id="internal-results-list"></ul>
         </div>
-      </form>
+      </section>
 
-      <section class="search-results">
-        <h2>Risultati interni (esempio)</h2>
-        <ul>
-          <li><button class="link-like" data-url="stupore.html">Lo stupore in <em>X agosto</em></button></li>
-          <li><button class="link-like" data-url="digitale-purpurea.html">Simbolismo in <em>Digitale purpurea</em></button></li>
-          <li><button class="link-like" data-url="gelsomino/index.html">Simboli del <em>Gelsomino notturno</em></button></li>
-        </ul>
+      <!-- RICERCA / NAVIGAZIONE ESTERNA -->
+      <section class="search-external">
+        <h2>Apri un sito esterno</h2>
+        <form id="url-form" class="url-form">
+          <label for="url-input">Inserisci un indirizzo web</label>
+          <div class="url-row">
+            <input id="url-input" type="text" placeholder="https://…" />
+            <button type="submit" class="primary-btn">Apri</button>
+          </div>
+        </form>
 
-        <h2>Risultati online (esempio)</h2>
-        <p class="small">
-          In una versione con motore di ricerca reale, qui comparirebbero link cliccabili
-          che si aprono nel browser interno sulla destra.
-        </p>
-        <ul>
-          <li><button class="link-like" data-url="https://it.wikipedia.org/wiki/Giovanni_Pascoli">Voce Wikipedia su Pascoli</button></li>
-          <li><button class="link-like" data-url="https://www.treccani.it/enciclopedia/giovanni-pascoli">Scheda Treccani</button></li>
-        </ul>
+        <section class="search-results">
+          <h3>Risorse online (esempio)</h3>
+          <p class="small">
+            Qui puoi tenere a portata di mano alcuni link utili: si aprono nel browser interno
+            sulla destra.
+          </p>
+          <ul>
+            <li>
+              <button class="link-like" data-url="https://it.wikipedia.org/wiki/Giovanni_Pascoli">
+                Wikipedia – Giovanni Pascoli
+              </button>
+            </li>
+            <li>
+              <button class="link-like" data-url="https://www.treccani.it/enciclopedia/giovanni-pascoli">
+                Treccani – Scheda Pascoli
+              </button>
+            </li>
+          </ul>
+        </section>
       </section>
     </section>
 
+    <!-- COLONNA DESTRA: BROWSER INTERNO -->
     <section class="search-right">
       <h2>Browser interno</h2>
       <p class="small">
-        Alcuni siti potrebbero non permettere l'apertura in questa cornice: in quel caso
-        puoi sempre aprirli in una nuova scheda del browser.
+        Le pagine del Libro.0 e i siti esterni si aprono qui, mantenendo la tua attenzione
+        dentro lo stesso ambiente. Alcuni siti potrebbero bloccare l’uso dentro un iframe:
+        in quel caso puoi aprirli in una nuova scheda del browser.
       </p>
       <div class="browser-frame">
         <iframe id="browser-frame" title="Browser interno Libro.0" src="about:blank"></iframe>
@@ -95,11 +123,126 @@
 
   <script>
     (function() {
-      const form = document.getElementById("url-form");
-      const input = document.getElementById("url-input");
       const frame = document.getElementById("browser-frame");
-      const links = document.querySelectorAll(".link-like");
 
+      // --- INDICE INTERNO DEL LIBRO.0 ---
+      // Puoi aggiungere altre voci qui man mano che il progetto cresce.
+      const internalIndex = [
+        {
+          title: "Home – Manifesto Libro.0",
+          url: "index.html",
+          type: "stanza",
+          description: "Pagina iniziale del Libro.0: manifesto, accesso alle stanze, Pascoli.",
+          keywords: "libro0 home manifesto pascoli progetto"
+        },
+        {
+          title: "Stanza della lettura",
+          url: "lettura.html",
+          type: "stanza",
+          description: "Spazio per la lettura con margine intelligente e invio a mappe, timeline, archivio.",
+          keywords: "lettura testo margine evidenziazioni"
+        },
+        {
+          title: "Stanza dell’annotazione",
+          url: "annota.html",
+          type: "stanza",
+          description: "Equivalente del quaderno personale: appunti, evidenziatore, post-it.",
+          keywords: "annotazioni appunti quaderno evidenziatore"
+        },
+        {
+          title: "Stanza delle mappe concettuali",
+          url: "mappe.html",
+          type: "stanza",
+          description: "Editor di mappe concettuali: nodi trascinabili, collegamenti, salvataggio locale.",
+          keywords: "mappe concettuali nodi pascoli sentimento fiore simbolismo"
+        },
+        {
+          title: "Stanza della lavagna",
+          url: "lavagna.html",
+          type: "stanza",
+          description: "Lavagna digitale per schemi liberi, con penna e gomma.",
+          keywords: "lavagna disegno schemi penna gomma"
+        },
+        {
+          title: "Stanza della timeline",
+          url: "timeline.html",
+          type: "stanza",
+          description: "Linea del tempo per organizzare eventi e testi.",
+          keywords: "timeline cronologia storia eventi"
+        },
+        {
+          title: "Stanza dell’archivio",
+          url: "archivio.html",
+          type: "stanza",
+          description: "Luogo dove convergono note, mappe, lavagne e materiali.",
+          keywords: "archivio memoria note mappe lavagne"
+        },
+        {
+          title: "Stanza della creazione",
+          url: "crea.html",
+          type: "stanza",
+          description: "Editor avanzato per produrre elaborati e testi personali.",
+          keywords: "creazione scrittura elaborati testi"
+        },
+        {
+          title: "Pascoli – Lo stupore",
+          url: "stupore.html",
+          type: "lezione",
+          description: "Capitolo su Pascoli e il sentimento base dello stupore.",
+          keywords: "pascoli stupore sentimento base fiore simbolismo"
+        },
+        {
+          title: "Pascoli – Visione del mondo",
+          url: "visione.html",
+          type: "lezione",
+          description: "Visione del mondo di Pascoli tra paura, scienza e simboli.",
+          keywords: "pascoli visione del mondo paura contro la scienza socialismo nazionalismo"
+        },
+        {
+          title: "Pascoli – Poetica del fanciullino",
+          url: "fanciullino.html",
+          type: "lezione",
+          description: "Il fanciullino come chiave della poetica pascoliana.",
+          keywords: "pascoli fanciullino poetica"
+        },
+        {
+          title: "Pascoli – La forma",
+          url: "forma.html",
+          type: "lezione",
+          description: "Gli aspetti formali e stilistici della poesia di Pascoli.",
+          keywords: "pascoli forma stile metrica linguaggio"
+        },
+        {
+          title: "Pascoli – Il simbolismo",
+          url: "simbolismo.html",
+          type: "lezione",
+          description: "Simboli, oggetti e immagini ricorrenti nella poesia pascoliana.",
+          keywords: "pascoli simbolismo simboli fiore notte nido"
+        },
+        {
+          title: "Testo – Il gelsomino notturno (web app)",
+          url: "gelsomino/index.html",
+          type: "testo",
+          description: "Pagina interattiva dedicata al Gelsomino notturno.",
+          keywords: "gelsomino notturno fiore eros notte nido simboli"
+        },
+        {
+          title: "Testo – X agosto",
+          url: "x-agosto.html",
+          type: "testo",
+          description: "Testo e analisi di X agosto con meccanismo analogico.",
+          keywords: "x agosto pascoli rondine croce dolore speculare"
+        },
+        {
+          title: "Testo – Digitale purpurea",
+          url: "digitale-purpurea.html",
+          type: "testo",
+          description: "Testo e analisi di Digitale purpurea, fiore simbolico e ambivalente.",
+          keywords: "digitale purpurea fiore veleno simbolo due donne"
+        }
+      ];
+
+      // --- FUNZIONE PER NORMALIZZARE GLI URL ---
       function normalizeUrl(value) {
         if (!value) return "";
         if (value.startsWith("http://") || value.startsWith("https://")) return value;
@@ -107,18 +250,94 @@
         return "https://" + value;
       }
 
-      form.addEventListener("submit", e => {
+      // --- RICERCA INTERNA ---
+      const internalForm = document.getElementById("internal-search-form");
+      const internalInput = document.getElementById("internal-query");
+      const internalInfo = document.getElementById("internal-results-info");
+      const internalList = document.getElementById("internal-results-list");
+
+      function renderInternalResults(query) {
+        internalList.innerHTML = "";
+        const q = (query || "").trim().toLowerCase();
+
+        if (!q) {
+          internalInfo.textContent =
+            "Digita una parola chiave per cercare tra le pagine del Libro.0.";
+          return;
+        }
+
+        const results = internalIndex.filter(item => {
+          const haystack = (
+            item.title +
+            " " +
+            item.description +
+            " " +
+            (item.keywords || "")
+          ).toLowerCase();
+          return haystack.includes(q);
+        });
+
+        if (results.length === 0) {
+          internalInfo.textContent = "Nessun risultato trovato per \"" + q + "\".";
+          return;
+        }
+
+        internalInfo.textContent =
+          "Trovate " + results.length + " pagine che contengono \"" + q + "\".";
+
+        results.forEach(item => {
+          const li = document.createElement("li");
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "link-like";
+          btn.setAttribute("data-url", item.url);
+
+          btn.innerHTML =
+            "<strong>" +
+            item.title +
+            "</strong> <span class=\"small\">(" +
+            item.type +
+            ")</span><br><span class=\"small\">" +
+            item.description +
+            "</span>";
+
+          li.appendChild(btn);
+          internalList.appendChild(li);
+        });
+      }
+
+      internalForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        const url = normalizeUrl(input.value.trim());
+        renderInternalResults(internalInput.value);
+      });
+
+      // ENTER diretto nel campo
+      internalInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          renderInternalResults(internalInput.value);
+        }
+      });
+
+      // --- RICERCA / APERTURA ESTERNA ---
+      const urlForm = document.getElementById("url-form");
+      const urlInput = document.getElementById("url-input");
+
+      urlForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const url = normalizeUrl(urlInput.value.trim());
         if (url) frame.src = url;
       });
 
-      links.forEach(btn => {
-        btn.addEventListener("click", () => {
-          const url = btn.getAttribute("data-url");
-          const normalized = normalizeUrl(url);
-          if (normalized) frame.src = normalized;
-        });
+      // --- GESTIONE CLICK SU TUTTI I .link-like (interni ed esterni) ---
+      document.addEventListener("click", (e) => {
+        const btn = e.target.closest(".link-like");
+        if (!btn) return;
+        const url = btn.getAttribute("data-url");
+        const normalized = normalizeUrl(url);
+        if (normalized) {
+          frame.src = normalized;
+        }
       });
     })();
   </script>
