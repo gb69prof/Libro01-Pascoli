@@ -1,4 +1,3 @@
-
 /* =========================
    Libro.0 – Stile Pascoli
    Layout: top bar + sidebar capitoli + pagina di libro centrale + margine attivo
@@ -233,7 +232,9 @@ body {
 
 /* Evidenziazioni */
 
-.lesson-text .highlight {
+.lesson-text mark,
+.lesson-text .highlight,
+.lesson-text .highlighted-text {
     background: #ffe9a7;
     padding: 0 0.05em;
     border-radius: 0.15em;
@@ -616,6 +617,7 @@ body.theme-E {
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
 /* --- NAVBAR LIBRO.0 --- */
 
 .navbar-libro0 {
@@ -658,8 +660,6 @@ body.theme-E {
 .navbar-libro0 .nav-links li a:hover {
   background: #444;
 }
-
-
 
 /* -------------------------
    Stanze cognitive – layout base
