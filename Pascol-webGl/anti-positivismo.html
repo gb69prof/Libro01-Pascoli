@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Pascoli — Anti-positivismo</title>
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --glass: rgba(20, 22, 26, 0.45);
+      --stroke: rgba(255,255,255,0.10);
+      --text: rgba(255,255,255,0.88);
+      --gold: rgba(255, 215, 120, 0.95);
+    }
+    html, body { margin:0; height:100%; background: var(--bg); overflow:hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .stage {
+      position: relative;
+      height: 100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 10px;
+    }
+    .frame {
+      position: relative;
+      width: min(1100px, 100%);
+      aspect-ratio: 2048 / 1365;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+    }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display:block;
+      user-select:none;
+      -webkit-user-drag: none;
+    }
+    .hotspot {
+      position:absolute;
+      border-radius: 14px;
+      cursor: pointer;
+      outline: none;
+      /* invisible but interactive; add subtle glow on hover/tap */
+      background: rgba(255, 215, 120, 0.00);
+      border: 1px solid rgba(255, 215, 120, 0.00);
+      transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+    .hotspot:hover, .hotspot:focus {
+      background: rgba(255, 215, 120, 0.10);
+      border-color: rgba(255, 215, 120, 0.30);
+      box-shadow: 0 0 0 6px rgba(255, 215, 120, 0.08);
+    }
+    .hud {
+      position: fixed;
+      top: 10px; left: 10px; right: 10px;
+      display:flex;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .chip {
+      pointer-events: auto;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: var(--glass);
+      border: 1px solid var(--stroke);
+      color: var(--text);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      font-size: 13px;
+      max-width: 70ch;
+      line-height: 1.2;
+    }
+    .chip b { color: var(--gold); font-weight: 700; }
+    .back {
+      pointer-events:auto;
+      position: fixed;
+      bottom: 14px;
+      left: 14px;
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      color: rgba(255,255,255,0.92);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      font-weight: 800;
+      font-size: 18px;
+    }
+    .fade {
+      position: fixed;
+      inset: 0;
+      pointer-events:none;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.90) 100%);
+      mix-blend-mode: multiply;
+    }
+  </style>
+</head>
+<body>
+  <div class="hud">
+    <div class="chip"><b>Pascoli</b> — tocca le parti illuminate per entrare nei nodi della mappa.</div>
+  </div>
+
+  <div class="stage">
+    <div class="frame">
+      <img src="assets/anti-positivismo.png" alt="Pascoli — Anti-positivismo" />
+
+    </div>
+  </div>
+
+  <a class="back" href="filosofia.html" aria-label="Indietro">←</a>
+  <div class="fade"></div>
+</body>
+</html>
