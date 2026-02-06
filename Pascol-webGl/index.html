@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Pascoli — Corridoio delle tragedie</title>
+  <style>
+    html, body { margin:0; height:100%; overflow:hidden; background:#050607; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    canvas { display:block; }
+    .hud { position: fixed; left: 0; top: 0; right: 0; display:flex; justify-content: space-between; align-items: center; padding: 10px 12px; pointer-events: none; }
+    .left, .right { display:flex; gap:10px; align-items:center; }
+    .panel { pointer-events: auto; backdrop-filter: blur(10px); background: rgba(20, 22, 26, 0.50); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 10px 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); color: rgba(255,255,255,0.92); }
+    .title { font-weight: 650; letter-spacing: 0.2px; font-size: 14px; color: rgba(255, 215, 120, 0.95); margin: 0 0 6px 0; }
+    .hint { font-size: 12px; color: rgba(255,255,255,0.75); line-height: 1.2; }
+    .btnRow { display:flex; gap:10px; margin-top:8px; }
+    .btn { pointer-events:auto; border: 1px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.92); border-radius: 14px; padding: 10px 14px; font-weight: 650; cursor: pointer; user-select:none; touch-action: manipulation; }
+    .btn:active { transform: translateY(1px); }
+    .sliderWrap { display:flex; flex-direction: column; gap:6px; min-width: 220px; }
+    input[type="range"] { width: 220px; }
+    .small { font-size: 12px; color: rgba(255,255,255,0.72); display:flex; justify-content:space-between; }
+    .fade { position: fixed; inset: 0; background: radial-gradient(ellipse at center, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.88) 100%); pointer-events:none; mix-blend-mode: multiply; }
+    .bottom { position: fixed; left: 0; right: 0; bottom: 10px; display:flex; justify-content:center; gap:12px; pointer-events:none; }
+    .bottom .btn { padding: 14px 18px; border-radius: 18px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <div class="hud">
+    <div class="left panel">
+      <div class="title">Corridoio delle tragedie</div>
+      <div class="hint">W / ↑ avanti — S / ↓ indietro. Trascina per guardare.</div>
+      <div class="btnRow">
+        <button class="btn" id="btnBack">← Indietro</button>
+        <button class="btn" id="btnForward">Avanti →</button>
+      </div>
+    </div>
+    <div class="right panel sliderWrap">
+      <div class="title">Velocità</div>
+      <input id="speed" type="range" min="0.4" max="3.0" step="0.1" value="1.2" />
+      <div class="small"><span>Lenta</span><span id="speedVal">1.2×</span><span>Veloce</span></div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <button class="btn" id="btnBack2">←</button>
+    <button class="btn" id="btnForward2">→</button>
+  </div>
+
+  <div class="fade"></div>
+
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    document.body.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x050607, 0.06);
+
+    const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 200);
+    camera.position.set(0, 1.6, 2.5);
+
+    const ambient = new THREE.AmbientLight(0x9aa6b2, 0.25);
+    scene.add(ambient);
+
+    const key = new THREE.PointLight(0xffd6a0, 1.0, 30, 2);
+    key.position.set(0, 2.4, 0);
+    scene.add(key);
+
+    const back = new THREE.PointLight(0x8fb9ff, 0.35, 60, 2);
+    back.position.set(0, 3.0, -25);
+    scene.add(back);
+
+    const corridorLen = 60;
+    const corridorW = 6;
+    const corridorH = 3.6;
+
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(corridorW, corridorLen),
+      new THREE.MeshStandardMaterial({ color: 0x0d0f12, roughness: 0.85, metalness: 0.05 })
+    );
+    floor.rotation.x = -Math.PI/2;
+    floor.position.set(0, 0, -corridorLen/2 + 5);
+    scene.add(floor);
+
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x0a0b0d, roughness: 0.95 });
+    const wallGeo = new THREE.PlaneGeometry(corridorLen, corridorH);
+
+    const wallL = new THREE.Mesh(wallGeo, wallMat);
+    wallL.rotation.y = Math.PI/2;
+    wallL.position.set(-corridorW/2, corridorH/2, -corridorLen/2 + 5);
+    scene.add(wallL);
+
+    const wallR = new THREE.Mesh(wallGeo, wallMat);
+    wallR.rotation.y = -Math.PI/2;
+    wallR.position.set(corridorW/2, corridorH/2, -corridorLen/2 + 5);
+    scene.add(wallR);
+
+    const ceiling = new THREE.Mesh(
+      new THREE.PlaneGeometry(corridorW, corridorLen),
+      new THREE.MeshStandardMaterial({ color: 0x08090b, roughness: 0.95 })
+    );
+    ceiling.rotation.x = Math.PI/2;
+    ceiling.position.set(0, corridorH, -corridorLen/2 + 5);
+    scene.add(ceiling);
+
+    // Light pools
+    for (let i=0; i<8; i++){
+      const p = new THREE.PointLight(0xffc98b, 0.55, 18, 2.2);
+      p.position.set((i%2===0 ? -1.8 : 1.8), 2.2, -i*7 - 4);
+      scene.add(p);
+    }
+
+    // Images
+    const loader = new THREE.TextureLoader();
+    const imageFiles = [
+      'assets/scene1_padre.png',
+      'assets/scene2_madre.png',
+      'assets/scene3_fratelli.png',
+      'assets/scene4_collegio.png',
+    ];
+    const placements = [
+      { z: -8,  w: 5.2, h: 3.6 },
+      { z: -18, w: 5.6, h: 3.8 },
+      { z: -28, w: 5.3, h: 3.8 },
+      { z: -38, w: 6.0, h: 3.6 },
+    ];
+
+    for (let i=0; i<imageFiles.length; i++){
+      const tex = loader.load(imageFiles[i]);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+
+      const mat = new THREE.MeshStandardMaterial({
+        map: tex,
+        transparent: true,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+        roughness: 0.65,
+        emissive: new THREE.Color(0x110c08),
+        emissiveIntensity: 0.6,
+      });
+
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(placements[i].w, placements[i].h), mat);
+      mesh.position.set(0, 1.7, placements[i].z);
+      scene.add(mesh);
+    }
+
+    // Drag look
+    let isDragging = false, lastX=0, lastY=0;
+    let yaw=0, pitch=0;
+    const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+
+    addEventListener('pointerdown', (e)=>{ isDragging=true; lastX=e.clientX; lastY=e.clientY; });
+    addEventListener('pointerup', ()=> isDragging=false);
+    addEventListener('pointermove', (e)=>{
+      if(!isDragging) return;
+      const dx=e.clientX-lastX, dy=e.clientY-lastY;
+      lastX=e.clientX; lastY=e.clientY;
+      yaw -= dx*0.0022;
+      pitch -= dy*0.0022;
+      pitch = clamp(pitch, -0.5, 0.5);
+      camera.rotation.set(pitch, yaw, 0);
+    });
+
+    // Movement controls
+    const keys = { forward:false, back:false };
+    addEventListener('keydown', (e)=>{
+      if (e.key==='w'||e.key==='ArrowUp') keys.forward=true;
+      if (e.key==='s'||e.key==='ArrowDown') keys.back=true;
+    });
+    addEventListener('keyup', (e)=>{
+      if (e.key==='w'||e.key==='ArrowUp') keys.forward=false;
+      if (e.key==='s'||e.key==='ArrowDown') keys.back=false;
+    });
+
+    const hook = (btn, which)=>{
+      btn.addEventListener('pointerdown', (e)=>{ e.preventDefault(); keys[which]=true; });
+      btn.addEventListener('pointerup', ()=> keys[which]=false);
+      btn.addEventListener('pointerleave', ()=> keys[which]=false);
+      btn.addEventListener('touchstart', (e)=>{ e.preventDefault(); keys[which]=true; }, {passive:false});
+      btn.addEventListener('touchend', ()=> keys[which]=false);
+    };
+    hook(document.getElementById('btnForward'), 'forward');
+    hook(document.getElementById('btnForward2'), 'forward');
+    hook(document.getElementById('btnBack'), 'back');
+    hook(document.getElementById('btnBack2'), 'back');
+
+    const speedEl = document.getElementById('speed');
+    const speedVal = document.getElementById('speedVal');
+    let speed = parseFloat(speedEl.value);
+    speedEl.addEventListener('input', ()=>{
+      speed = parseFloat(speedEl.value);
+      speedVal.textContent = speed.toFixed(1) + '×';
+    });
+
+    const zMin = -52, zMax = 4;
+    const clock = new THREE.Clock();
+
+    function animate(){
+      requestAnimationFrame(animate);
+      const dt = Math.min(0.05, clock.getDelta());
+      const t = clock.elapsedTime;
+
+      const moveDir = (keys.forward ? -1 : 0) + (keys.back ? 1 : 0);
+      camera.position.z = clamp(camera.position.z + moveDir * dt * 2.0 * speed, zMin, zMax);
+
+      key.intensity = 0.85 + Math.sin(t*0.9)*0.15;
+      scene.fog.density = 0.055 + Math.sin(t*0.35)*0.004;
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    addEventListener('resize', ()=>{
+      camera.aspect = innerWidth/innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+  </script>
+</body>
+</html>
