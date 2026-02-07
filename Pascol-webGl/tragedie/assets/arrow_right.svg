@@ -1,4 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-<defs><filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity=".35"/></filter></defs>
-<path filter="url(#s)" d="M36 12 56 32 36 52l-6-6 10-10H8v-8h32L30 18z" fill="white" fill-opacity=".92"/>
-</svg>
